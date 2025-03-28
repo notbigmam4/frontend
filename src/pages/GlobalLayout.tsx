@@ -5,7 +5,7 @@ import {Helmet} from 'react-helmet'
 const GlobalContext = createContext<{user:{name:string, birthday:string,img:string,dagenstall:string,id:string}| undefined,setUser:Function}|undefined>(undefined)
 
 const GlobalLayout = () => {
-
+  console.log('global layout')
   const [user, setUser] = useState<{name:string, birthday:string,img:string,dagenstall:string,id:string}| undefined>(undefined)
   const navigate = useNavigate()
 
