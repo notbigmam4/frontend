@@ -121,23 +121,23 @@ const Førerkort = ({
           </h5>
 
           <div className="flex gap-3 w-full h-fit ml-8 mt-10 z-10">
-            <InfoButton className="border-l-[5px] flex flex-col items-start justify-start p-3 w-[44.5%]">
-              <div className="text-[28px] leading-none font-bold text-[#444f55] mb-6 text-left">
+            <InfoButton className="border-l-[3px] flex flex-col items-start justify-start p-2 w-[44.5%]">
+              <div className="text-[18px] leading-none font-bold text-[#444f55] mb-4 text-left">
                 B
               </div>
               <img
-                className="h-[28px] w-auto object-contain self-start"
+                className="h-[18px] w-auto object-contain self-start"
                 alt="car"
                 src={caricon}
               />
             </InfoButton>
 
-            <InfoButton className="border-l-[5px] flex flex-col items-start justify-start p-3 w-[44.5%]">
-              <div className="text-[28px] leading-none font-bold text-[#444f55] mb-6 text-left">
+            <InfoButton className="border-l-[3px] flex flex-col items-start justify-start p-3 w-[44.5%]">
+              <div className="text-[18px] leading-none font-bold text-[#444f55] mb-6 text-left">
                 AM
               </div>
               <img
-                className="h-[28px] w-auto object-contain self-start"
+                className="h-[18px] w-auto object-contain self-start"
                 alt="moped"
                 src={mopedicon}
               />
