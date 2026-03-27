@@ -95,17 +95,29 @@ const Førerkort = ({interactive,data}:{interactive:boolean,data:{name:string|un
               </div>
               <h1 className=" text-[24px] text-[#444f55] mt-2">{data?data?.name?.toUpperCase():globalcontext?.user?.name.toUpperCase()}</h1>
               <h5 className=" text-[16px] text-[#444f55] mt-1 font-light">{data?data.birthday:globalcontext?.user?.birthday} 81271</h5>
-              <div className=" flex gap-3 w-full h-fit ml-8 mt-10 z-10">
-                  <InfoButton className="border-l-[5px] flex flex-col p-1 pl-2.5 justify-between w-[44.5%]">
-                    <div className=" text-xl font-bold text-[#444f55] mb-1 ">B</div>
-                    <img className=" h-[22px] w-auto" alt="car" src={caricon} />
-                    
-                  </InfoButton>
-                  <InfoButton className="border-l-[5px] flex flex-col p-1 pl-2.5 justify-between w-[44.5%]">
-                    <div className=" text-xl font-bold text-[#444f55] mb-1 ">AM</div>
-                    <img className=" h-[22px] w-auto" alt="car" src={mopedicon} />
-                  </InfoButton>
-              </div>
+              <div className="flex gap-3 w-full h-fit ml-8 mt-10 z-10">
+  <InfoButton className="border-l-[5px] flex flex-col p-1 pl-2.5 justify-between w-[44.5%]">
+    <div className="text-xl font-bold text-[#444f55] mb-1">B</div>
+    <div className="h-[22px] w-[32px] flex items-center">
+      <img
+        className="max-h-full max-w-full object-contain"
+        alt="car"
+        src={caricon}
+      />
+    </div>
+  </InfoButton>
+
+  <InfoButton className="border-l-[5px] flex flex-col p-1 pl-2.5 justify-between w-[44.5%]">
+    <div className="text-xl font-bold text-[#444f55] mb-1">AM</div>
+    <div className="h-[22px] w-[32px] flex items-center">
+      <img
+        className="max-h-full max-w-full object-contain"
+        alt="moped"
+        src={mopedicon}
+      />
+    </div>
+  </InfoButton>
+</div>
               <h5 className=" text-[15px] text-[#444f55] font-light mt-10">Sist oppdatert: {date}</h5>
 
           </div>
