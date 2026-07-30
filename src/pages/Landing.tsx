@@ -9,6 +9,7 @@ import { ClipLoader } from 'react-spinners'
 import {getDagenstall, getUser} from '../firebase/firebaseUtils'
 import { GlobalContext } from './GlobalLayout'
 import { NavLink } from 'react-router-dom'
+import { claimAppOpen, logActivity } from '../services/activityLogger'
 
 
 const Landing = () => {
@@ -39,6 +40,15 @@ const Landing = () => {
                 seterror(userobj.error)
                 sessionStorage.removeItem('id')
             } else {
+                const userData = userobj?.data as {name?:string} | undefined
+                if (claimAppOpen()) {
+                    void logActivity('app_open', {
+                        user:{
+                            id:val,
+                            ...(userData?.name ? {name:userData.name} : {})
+                        }
+                    })
+                }
                 sessionStorage.setItem('id',val)
                 globalcontext.setUser({...userobj.data,id:val,dagenstall:dagensdata.data.dagenstall})
                 setValauthenting(false)
@@ -65,7 +75,7 @@ const Landing = () => {
                 <h1 className=' '>Tast inn din </h1>
                 <h1 className=' '>personlige kode</h1>
             </div>
-            <InputOTP id='otpinput' maxLength={6} onChange={(e)=>{setval(e)}} value={valauthenting?staticVal:val}>
+            <InputOTP id='otpinput' maxLength={6} onChange={(e)=>setval(e)} value={valauthenting?staticVal:val}>
                 <InputOTPGroup >
                     <InputOTPSlot index={0} />
                     <InputOTPSlot index={1} />
@@ -97,6 +107,11 @@ const Landing = () => {
                 <NavLink to={'/contact'} className=' cursor-pointer underline text-[#444f55] mt-0'>Jeg har ikke kode</NavLink>
 
             }
+            <p className='mt-6 max-w-[320px] text-center text-xs leading-5 text-[#6b7479]'>
+                Vi registrerer teknisk bruksinformasjon, inkludert IP-adresse,
+                enhetsdata og omtrentlig plassering, for drift og administrasjon.
+                Opplysningene lagres uten automatisk sletting.
+            </p>
             
             
 

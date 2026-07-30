@@ -1,10 +1,26 @@
 
-import { collection, deleteDoc, doc, getDoc, getDocs, setDoc, updateDoc } from "firebase/firestore";
+import {
+    addDoc,
+    collection,
+    deleteDoc,
+    doc,
+    getDoc,
+    getDocs,
+    limit,
+    orderBy,
+    query,
+    serverTimestamp,
+    setDoc,
+    startAfter,
+    updateDoc,
+} from "firebase/firestore";
+import type { DocumentData, QueryDocumentSnapshot } from "firebase/firestore";
 import {db, imgdb} from './firebaseConfig'
 import { getStorage, ref, deleteObject, listAll, uploadBytes, getDownloadURL } from "firebase/storage";
 import { ChangeEvent } from "react";
 import { nanoid } from 'nanoid';
 import { UserType } from "../types/User";
+import type { ActivityLog, ActivityLogInput } from "../types/ActivityLog";
 import { generateRandomId16 } from "../utils";
 async function deleteImages(folder:string) {
 
@@ -227,6 +243,38 @@ async function GetMessages () {
     
 }
 
+type ActivityLogCursor = QueryDocumentSnapshot<DocumentData>
+
+async function addActivityLog (activity:ActivityLogInput) {
+    await addDoc(collection(db, "activityLogs"), {
+        ...activity,
+        createdAt:serverTimestamp()
+    })
+}
+
+async function getActivityLogsPage (
+    pageSize = 50,
+    cursor?:ActivityLogCursor
+) {
+    const activityCollection = collection(db, "activityLogs")
+    const activityQuery = cursor
+        ? query(activityCollection, orderBy("createdAt", "desc"), startAfter(cursor), limit(pageSize))
+        : query(activityCollection, orderBy("createdAt", "desc"), limit(pageSize))
+    const snapshot = await getDocs(activityQuery)
+    const logs = snapshot.docs.map((activityDoc)=>({
+        id:activityDoc.id,
+        ...activityDoc.data()
+    })) as ActivityLog[]
+
+    return {
+        logs,
+        lastDoc:snapshot.docs[snapshot.docs.length - 1],
+        hasMore:snapshot.docs.length === pageSize
+    }
+}
+
 
 export {getUser, createUser,getDagenstall,addDataUser, deleteImages, uploadImage, setDagenstall, 
-    getUsers, deleteUser, updateDataUser, createPaymentID, AddMessageUser, GetMessages}
+    getUsers, deleteUser, updateDataUser, createPaymentID, AddMessageUser, GetMessages,
+    addActivityLog, getActivityLogsPage}
+export type {ActivityLogCursor}

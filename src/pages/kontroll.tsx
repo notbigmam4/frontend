@@ -51,8 +51,17 @@ const Kontroll = () => {
                 <h5 className=" text-[70px] text-[#444f55] mt-0 font-bold tracking-tight leading-snug ">
                     {globalcontext?.user?.dagenstall}
                 </h5>
-                <div className=" border-[#E8E8E8] border w-[74%] h-fit p-2.5 relative z-10 bg-white">
-                <img src={qr} alt='qr' className=" w-full h-full"/>
+                <div className=" border-[#E8E8E8] border w-[74%] aspect-square p-2.5 relative z-10 bg-white">
+                <img
+                    src={qr}
+                    alt='qr'
+                    width={1024}
+                    height={1024}
+                    loading='eager'
+                    fetchPriority='high'
+                    decoding='sync'
+                    className="w-full h-full object-contain"
+                />
                 </div>
                 <h5 className=" text-[15px] text-[#444f55] font-light mt-3">Sist oppdatert: {date}</h5>
 

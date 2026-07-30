@@ -83,22 +83,36 @@ const Førerkort = ({
         >
           <RotatingImage left={true} />
 
-          <div className="border-[#E8E8E8] border w-[45%] h-fit p-1 relative z-10 bg-white">
+          <div
+            className="border-[#E8E8E8] border w-[45%] h-fit p-1 relative z-10 bg-white"
+            style={data ? undefined : { aspectRatio: globalcontext?.userImageAspectRatio }}
+          >
             <div className="w-fit h-fit absolute right-[2px] top-[10px]">
               <JumpingLetter />
             </div>
 
-            <img
-              loading="eager"
-              alt="..."
-              src={data ? data.img : globalcontext?.user?.img}
-              className="w-full object-cover"
-              onClick={() => {
-                if (interactive) {
-                  setnavpath('/p');
-                }
-              }}
-            />
+            {data ? (
+              <img
+                loading="eager"
+                fetchPriority="high"
+                decoding="sync"
+                alt=""
+                src={data.img}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div
+                role="img"
+                aria-label={globalcontext?.user?.name}
+                className="w-full h-full bg-cover bg-center"
+                style={{ backgroundImage: `url("${globalcontext?.userImageSrc}")` }}
+                onClick={() => {
+                  if (interactive) {
+                    setnavpath('/p');
+                  }
+                }}
+              />
+            )}
 
             <div
               className="border-[#E8E8E8] border-t border-r absolute bottom-0 left-0 w-fit h-fit p-1 bg-white"

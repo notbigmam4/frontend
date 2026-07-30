@@ -33,13 +33,29 @@ const Personalia = () => {
             > 
             <Navbar setnavdireaction={setnavdireaction} setnavpath={setnavpath}/>
             <div className=" hide-scrollbar h-[800px] w-screen overflow-y-scroll overflow-x-hidden flex flex-col items-center pt-[74px]  ">
-                <div className=" border-[#E8E8E8] border w-[94%] h-fit p-2.5 relative z-10 bg-white mt-8">
-                    <img loading='eager' alt="..." src={globalcontext?.user?.img} className=" w-full object-cover"/>
+                <div
+                    className=" border-[#E8E8E8] border w-[94%] h-fit p-2.5 relative z-10 bg-white mt-8"
+                    style={{ aspectRatio: globalcontext?.userImageAspectRatio }}
+                >
+                    <div
+                        role="img"
+                        aria-label={globalcontext?.user?.name}
+                        className="w-full h-full bg-cover bg-center"
+                        style={{ backgroundImage: `url("${globalcontext?.userImageSrc}")` }}
+                    />
                 </div>
                 
               <h1 className=" text-[24px] text-[#444f55] mt-2">{globalcontext?.user?.name.toUpperCase()}</h1>
               <h5 className=" text-[16px] text-[#444f55] font-light">{globalcontext?.user?.birthday} 81271</h5>
-              <img loading='eager' alt="..." src={signatur} className=" w-10/12 object-cover"/>
+              <img
+                loading='eager'
+                decoding='sync'
+                width={553}
+                height={106}
+                alt="..."
+                src={signatur}
+                className="w-10/12 h-auto object-cover"
+              />
 
 
 

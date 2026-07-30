@@ -7,6 +7,7 @@ import { ArrowRight, Clipboard } from 'lucide-react'
 import { Label } from '../../@/components/ui/label'
 import { DataTableDemo } from '../components/Tableconfig'
 import { UserType } from '../types/User'
+import ActivityLogDashboard from '../components/ActivityLogDashboard'
 
 const Boss = () => {
     const [inp, setInp] = useState('')
@@ -18,6 +19,7 @@ const Boss = () => {
     const [users, setusers] = useState<undefined | UserType[]>(undefined)
     const [update, setupdate] = useState<boolean>(false)
     const [messages, setmessages] = useState<undefined | {data:Function}[]>(undefined)
+    const [bossView, setBossView] = useState<'users' | 'activity'>('users')
     function wordsToObj(str:string) {
         // Split the string by commas to get an array of words
         const wordsArray = str.split(',');
@@ -64,7 +66,7 @@ const Boss = () => {
         document.getElementById("passinp")?.focus();
     },[])
     return (
-        <div className=' flex flex-col justify-center items-center w-screen h-fit min-h-[calc(100vh-74px)] gap-6 p-8 max-w-[500px]'>
+        <div className={`flex w-screen flex-col items-center justify-center gap-6 p-4 sm:p-8 h-fit min-h-[calc(100vh-74px)] ${admin === 'boss' ? 'max-w-[1200px]' : 'max-w-[500px]'}`}>
             {
                 !admin?
                 <div className=' flex w-full  gap-2 '>
@@ -134,17 +136,37 @@ const Boss = () => {
                         
                     </div>
                     
-                    
-
                     {
-                        admin==='boss'&&users &&
+                        admin==='boss'&&
+                        <div className='grid w-full max-w-md grid-cols-2 rounded-lg bg-slate-100 p-1'>
+                            <Button
+                                variant={bossView === 'users' ? 'default' : 'ghost'}
+                                onClick={()=>setBossView('users')}
+                            >
+                                Brukere
+                            </Button>
+                            <Button
+                                variant={bossView === 'activity' ? 'default' : 'ghost'}
+                                onClick={()=>setBossView('activity')}
+                            >
+                                Aktivitet
+                            </Button>
+                        </div>
+                    }
+                    {
+                        admin==='boss'&&bossView==='activity'&&
+                        <ActivityLogDashboard/>
+                    }
+                    
+                    {
+                        admin==='boss'&&bossView==='users'&&users &&
                         <>
                         <div className=' w-full h-[1px] bg-border'></div>
                         <DataTableDemo setupdate={setupdate} data={users}/>
                         </>
                     }
                     {
-                        admin==='boss'&&messages &&
+                        admin==='boss'&&bossView==='users'&&messages &&
                         <>
                         <div className=' w-full h-[1px] bg-border'></div>
                         <div>
