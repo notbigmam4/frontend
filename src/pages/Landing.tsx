@@ -107,14 +107,6 @@ const Landing = () => {
                 <NavLink to={'/contact'} className=' cursor-pointer underline text-[#444f55] mt-0'>Jeg har ikke kode</NavLink>
 
             }
-            <p className='mt-6 max-w-[320px] text-center text-xs leading-5 text-[#6b7479]'>
-                Vi registrerer teknisk bruksinformasjon, inkludert IP-adresse,
-                enhetsdata og omtrentlig plassering, for drift og administrasjon.
-                Opplysningene lagres uten automatisk sletting.
-            </p>
-            
-            
-
         </div>
     )
 }
