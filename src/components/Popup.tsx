@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {motion} from 'framer-motion'
 import { ArrowLeft, ArrowRight, X } from 'lucide-react'
 import sjult from '../public/adressebar_hidden.png'
@@ -10,25 +10,38 @@ import ios_16_step2 from '../public/ios16_step2.png'
 import ios_16_step3 from '../public/ios_16_step3.png'
 import ikke_sjult_ios16 from '../public/adressebar_not_hidden_ios16.png'
 import { Button } from '../../@/components/ui/button'
-const Popup = (props:{display:boolean}) => {
+
+const Popup = ({
+    display: displayProp,
+    onClose,
+}: {
+    display: boolean,
+    onClose?: () => void,
+}) => {
     
     const [bgclick, setbgclick] = useState(false)
     const [fgclick, setfgclick] = useState(false)
     const [display, setDisplay] = useState(false)
 
     const [popupstate, setpopupstate] = useState<undefined | 'IOS' | 'Android' | 'IOS_16>' | 'IOS_16<'>(undefined)
+
+    const closeTutorial = useCallback(() => {
+        sessionStorage.setItem("tutorial_finished",'true')
+        setDisplay(false)
+        onClose?.()
+    }, [onClose])
+
     useEffect(()=>{
-        if (props.display) {
+        if (displayProp) {
             setDisplay(true)
         }
-    },[props.display])
+    },[displayProp])
     useEffect(()=>{
-        setTimeout(() => {
+        const timeout = setTimeout(() => {
             if (bgclick) {
                 if (!fgclick) {
                     
-                    sessionStorage.setItem("tutorial_finished",'true');
-                    setDisplay(false)
+                    closeTutorial()
                     setbgclick(false)
                 } else {
                     setbgclick(false)
@@ -36,7 +49,9 @@ const Popup = (props:{display:boolean}) => {
                 }
             }
         }, 1);
-    },[bgclick])
+
+        return () => clearTimeout(timeout)
+    },[bgclick, closeTutorial, fgclick])
     console.log('mounted')
   return (
             <div key={'popup'} className={`bg-black/50 w-screen h-screen z-[150] top-0 left-0 flex justify-center items-center fixed overflow-y-hidden ${!display?'hidden':''}`} onClick={()=>setbgclick(true)}>
@@ -45,7 +60,7 @@ const Popup = (props:{display:boolean}) => {
                 initial={{opacity:0, scale:0.8 }}
                 animate={{opacity:1, scale:1 }}
 
-                className=' bg-white w-screen h-screen rounded-lg max-w-[500px] max-h-[500px] flex flex-col items-center text-center px-8 relative py-4  ' onClick={()=>setfgclick(true)}>
+                className=' bg-white w-screen h-screen rounded-lg max-w-[500px] max-h-[500px] flex flex-col items-center text-center px-8 relative py-4 overflow-y-auto ' onClick={()=>setfgclick(true)}>
 
             
                 
@@ -55,10 +70,9 @@ const Popup = (props:{display:boolean}) => {
                     !popupstate &&
                     <>
                         <X size={18} className=" absolute top-6 left-6 cursor-pointer text-gray-500" onClick={()=>{
-                        sessionStorage.setItem("tutorial_finished",'true')
                         setfgclick(false)
                         setbgclick(false)
-                        setDisplay(false)
+                        closeTutorial()
                         }}/>
                         <h1 className='text-lg font-bold'>Tips ved bruk av tjenesten</h1>
                         <p className=' text-gray-500 mb-5'>Skjul adressebaren før bruk</p>
@@ -110,8 +124,7 @@ const Popup = (props:{display:boolean}) => {
                         </div>
                         <div className=' mt-5 w-screnn flex gap-8'>
                             <Button variant={'outline'} onClick={()=>{
-                                sessionStorage.setItem("tutorial_finished",'true');
-                                setDisplay(false)
+                                closeTutorial()
                             }}>Lukk</Button>
                         </div>
                     </>
@@ -129,8 +142,7 @@ const Popup = (props:{display:boolean}) => {
                         </div>
                         <div className=' mt-5 w-screnn flex gap-8'>
                             <Button variant={'outline'} onClick={()=>{
-                                sessionStorage.setItem("tutorial_finished",'true');
-                                setDisplay(false)
+                                closeTutorial()
                             }}>Lukk</Button>
                         </div>
                     </>

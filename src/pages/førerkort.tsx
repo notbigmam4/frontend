@@ -11,6 +11,21 @@ import { GlobalContext } from './GlobalLayout';
 import { useContext, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Popup from '../components/Popup';
+import MotionPermissionPopup from '../components/MotionPermissionPopup';
+
+type DeviceOrientationPermissionEvent = typeof DeviceOrientationEvent & {
+  requestPermission?: () => Promise<'granted' | 'denied'>
+}
+
+function needsMotionPermission() {
+  const orientationEvent =
+    window.DeviceOrientationEvent as DeviceOrientationPermissionEvent | undefined;
+
+  return (
+    typeof orientationEvent?.requestPermission === 'function' &&
+    sessionStorage.getItem('device_orientation_permission_granted_v2') !== 'true'
+  );
+}
 
 const Førerkort = ({
   interactive,
@@ -21,14 +36,18 @@ const Førerkort = ({
 }) => {
   const navigate = useNavigate();
   const [displaytutorial, setdisplaytutorial] = useState(false);
+  const [displaymotionpermission, setdisplaymotionpermission] = useState(false);
   const [navdireaction, setnavdireaction] = useState<'right' | 'left'>('right');
   const [navpath, setnavpath] = useState('');
   const globalcontext = useContext(GlobalContext);
 
   useEffect(() => {
     const tutorial = sessionStorage.getItem("tutorial_finished");
+
     if (!tutorial) {
       setdisplaytutorial(true);
+    } else if (needsMotionPermission()) {
+      setdisplaymotionpermission(true);
     }
   }, []);
 
@@ -61,7 +80,23 @@ const Førerkort = ({
 
   return (
     <>
-      {displaytutorial && interactive && <Popup display={displaytutorial} />}
+      {displaytutorial && interactive && (
+        <Popup
+          display={displaytutorial}
+          onClose={() => {
+            setdisplaytutorial(false);
+            if (needsMotionPermission()) {
+              setdisplaymotionpermission(true);
+            }
+          }}
+        />
+      )}
+      {displaymotionpermission && interactive && (
+        <MotionPermissionPopup
+          display={displaymotionpermission}
+          onClose={() => setdisplaymotionpermission(false)}
+        />
+      )}
 
       <motion.div
         initial={{ x: -300 }}
@@ -83,10 +118,8 @@ const Førerkort = ({
         >
           <RotatingImage left={true} />
 
-          <div className="border-[#E8E8E8] border w-[45%] h-fit p-1 relative z-10 bg-white">
-            <div className="w-fit h-fit absolute right-[2px] top-[10px]">
-              <JumpingLetter />
-            </div>
+          <div className="relative z-10 h-fit w-[45%] border border-[#E8E8E8] bg-white p-1">
+            <JumpingLetter motionEnabled={interactive} />
 
             <img
               loading="eager"
