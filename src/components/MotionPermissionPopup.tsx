@@ -1,18 +1,9 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Move3D, X } from 'lucide-react';
+import { Move3D } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '../../@/components/ui/button';
-
-type DeviceOrientationPermissionEvent = typeof DeviceOrientationEvent & {
-    requestPermission?: () => Promise<'granted' | 'denied'>;
-};
-
-type PermissionState =
-    | 'idle'
-    | 'requesting'
-    | 'denied'
-    | 'insecure'
-    | 'unavailable';
+import { requestMotionPermission } from '../utils/motionPermission';
 
 type MotionPermissionPopupProps = {
     display: boolean;
@@ -23,44 +14,22 @@ const MotionPermissionPopup = ({
     display,
     onClose,
 }: MotionPermissionPopupProps) => {
-    const [permissionState, setPermissionState] =
-        useState<PermissionState>('idle');
+    const navigate = useNavigate();
+    const [requesting, setRequesting] = useState(false);
 
-    async function requestMotionPermission() {
-        if (!window.isSecureContext) {
-            setPermissionState('insecure');
+    async function enableMotion() {
+        setRequesting(true);
+        const permission = await requestMotionPermission();
+
+        if (permission === 'granted') {
+            onClose();
             return;
         }
 
-        const orientationEvent =
-            window.DeviceOrientationEvent as
-                | DeviceOrientationPermissionEvent
-                | undefined;
-
-        if (!orientationEvent?.requestPermission) {
-            setPermissionState('unavailable');
-            return;
-        }
-
-        setPermissionState('requesting');
-
-        try {
-            const permission = await orientationEvent.requestPermission();
-
-            if (permission === 'granted') {
-                sessionStorage.setItem(
-                    'device_orientation_permission_granted_v2',
-                    'true',
-                );
-                window.dispatchEvent(new Event('motionpermissiongranted'));
-                onClose();
-                return;
-            }
-
-            setPermissionState('denied');
-        } catch {
-            setPermissionState('denied');
-        }
+        navigate('/permission-required', {
+            replace: true,
+            state: { reason: permission },
+        });
     }
 
     if (!display) {
@@ -74,15 +43,6 @@ const MotionPermissionPopup = ({
                 animate={{ opacity: 1, scale: 1 }}
                 className="relative flex w-[calc(100%_-_32px)] max-w-[420px] flex-col items-center rounded-lg bg-white px-8 py-8 text-center"
             >
-                <button
-                    type="button"
-                    aria-label="Lukk"
-                    className="absolute left-6 top-6 cursor-pointer text-gray-500"
-                    onClick={onClose}
-                >
-                    <X size={18} />
-                </button>
-
                 <Move3D size={40} className="mb-4 mt-2 text-[#444f55]" />
                 <h1 className="text-lg font-bold">Aktiver bevegelse</h1>
                 <p className="mt-2 text-gray-500">
@@ -90,37 +50,13 @@ const MotionPermissionPopup = ({
                     vipper telefonen.
                 </p>
 
-                {permissionState === 'insecure' && (
-                    <p className="mt-4 text-sm text-gray-500">
-                        Bevegelse kan bare aktiveres fra den sikre HTTPS-versjonen
-                        av siden.
-                    </p>
-                )}
-                {permissionState === 'denied' && (
-                    <p className="mt-4 text-sm text-destructive">
-                        Tillatelsen ble avslått. Du kan prøve igjen.
-                    </p>
-                )}
-                {permissionState === 'unavailable' && (
-                    <p className="mt-4 text-sm text-gray-500">
-                        Bevegelsessensoren er ikke tilgjengelig i denne
-                        nettleseren.
-                    </p>
-                )}
-
-                <div className="mt-6 flex gap-3">
-                    <Button variant="outline" onClick={onClose}>
-                        Ikke nå
-                    </Button>
-                    <Button
-                        onClick={requestMotionPermission}
-                        disabled={permissionState === 'requesting'}
-                    >
-                        {permissionState === 'requesting'
-                            ? 'Venter...'
-                            : 'Aktiver bevegelse'}
-                    </Button>
-                </div>
+                <Button
+                    className="mt-6"
+                    onClick={enableMotion}
+                    disabled={requesting}
+                >
+                    {requesting ? 'Venter...' : 'Aktiver bevegelse'}
+                </Button>
             </motion.div>
         </div>
     );

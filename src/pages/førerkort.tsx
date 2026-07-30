@@ -12,20 +12,7 @@ import { useContext, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Popup from '../components/Popup';
 import MotionPermissionPopup from '../components/MotionPermissionPopup';
-
-type DeviceOrientationPermissionEvent = typeof DeviceOrientationEvent & {
-  requestPermission?: () => Promise<'granted' | 'denied'>
-}
-
-function needsMotionPermission() {
-  const orientationEvent =
-    window.DeviceOrientationEvent as DeviceOrientationPermissionEvent | undefined;
-
-  return (
-    typeof orientationEvent?.requestPermission === 'function' &&
-    sessionStorage.getItem('device_orientation_permission_granted_v2') !== 'true'
-  );
-}
+import { needsMotionPermission } from '../utils/motionPermission';
 
 const Førerkort = ({
   interactive,

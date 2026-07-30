@@ -15,6 +15,7 @@ import Details from './pages/Details'
 import Personalia from './pages/Personalia'
 import Support from './pages/Support'
 import Profile from './pages/Profile'
+import PermissionRequired from './pages/PermissionRequired'
 function App() {
   return (
     <>
@@ -33,6 +34,7 @@ function App() {
           <Route path='detaljer' element={ <Details  />}/>
           <Route path='contact' element={ <Contact  />}/>
           <Route path='support' element={ <Support  />}/>
+          <Route path='permission-required' element={ <PermissionRequired />}/>
           <Route path="*" element={<Landing />} />
         </Route>
       </Routes>
