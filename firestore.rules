@@ -1,0 +1,168 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Only this Firebase Authentication account may perform admin operations.
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.uid == "mPC74atZr3YqMAbePMdVa3x1PE52";
+    }
+
+    function isSixDigitCode(value) {
+      return value.matches('^[0-9]{6}$');
+    }
+
+    function isValidProfileUpdate(userId) {
+      return isSixDigitCode(userId)
+        && resource.data.status == "pending"
+        && !("name" in resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(["img", "name", "birthday"])
+        && request.resource.data.img is string
+        && request.resource.data.img.size() <= 2048
+        && request.resource.data.name is string
+        && request.resource.data.name.size() >= 3
+        && request.resource.data.name.size() <= 120
+        && request.resource.data.birthday is string
+        && request.resource.data.birthday.matches('^[0-9]{6}$');
+    }
+
+    function isValidActivityUser(user) {
+      return user.keys().hasOnly(["id", "name"])
+        && user.id is string
+        && isSixDigitCode(user.id)
+        && (!("name" in user)
+          || (user.name is string && user.name.size() <= 120));
+    }
+
+    function isValidActivityGeo(geo) {
+      return geo.keys().hasOnly([
+          "ip",
+          "city",
+          "region",
+          "country",
+          "countryCode",
+          "continent",
+          "latitude",
+          "longitude",
+          "timezone",
+          "isp",
+          "asn"
+        ])
+        && geo.size() <= 11;
+    }
+
+    function isValidActivityDevice(device) {
+      return device.keys().hasOnly([
+          "userAgent",
+          "platform",
+          "languages",
+          "timezone",
+          "screen",
+          "viewport",
+          "pixelRatio",
+          "colorDepth",
+          "touchPoints",
+          "online",
+          "cookiesEnabled",
+          "doNotTrack",
+          "connectionType",
+          "effectiveConnectionType",
+          "downlinkMbps",
+          "roundTripTimeMs"
+        ])
+        && device.userAgent is string
+        && device.userAgent.size() <= 1024
+        && device.platform is string
+        && device.platform.size() <= 128
+        && device.languages is list
+        && device.languages.size() <= 20
+        && device.timezone is string
+        && device.timezone.size() <= 128;
+    }
+
+    match /Users/{userId} {
+      // A six-digit code is a capability for one document. Collection
+      // enumeration is separately restricted to the authenticated admin.
+      allow get: if isSixDigitCode(userId);
+      allow list: if isAdmin();
+      allow create: if isAdmin()
+        && isSixDigitCode(userId)
+        && request.resource.data.keys().hasOnly(["id", "slug", "status"])
+        && request.resource.data.id == userId
+        && request.resource.data.slug is string
+        && request.resource.data.slug.size() >= 1
+        && request.resource.data.slug.size() <= 120
+        && request.resource.data.status == "pending";
+      allow update: if isAdmin() || isValidProfileUpdate(userId);
+      allow delete: if isAdmin();
+    }
+
+    match /public/dagensdata {
+      allow get: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /Messages/{messageId} {
+      allow get, list, delete: if isAdmin();
+      allow create: if request.resource.data.keys()
+          .hasOnly(["email", "message", "createdAt"])
+        && request.resource.data.email is string
+        && request.resource.data.email.size() >= 6
+        && request.resource.data.email.size() <= 320
+        && request.resource.data.email.matches('^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$')
+        && request.resource.data.message is string
+        && request.resource.data.message.size() >= 4
+        && request.resource.data.message.size() <= 4000
+        && request.resource.data.createdAt == request.time;
+      allow update: if false;
+    }
+
+    match /activityLogs/{logId} {
+      allow get, list: if isAdmin();
+      allow create: if request.resource.data.keys().hasOnly([
+          "eventType",
+          "clientTimestamp",
+          "sessionId",
+          "path",
+          "url",
+          "referrer",
+          "user",
+          "geo",
+          "device",
+          "details",
+          "createdAt"
+        ])
+        && request.resource.data.eventType == "app_open"
+        && request.resource.data.clientTimestamp is string
+        && request.resource.data.sessionId is string
+        && request.resource.data.sessionId.size() <= 128
+        && request.resource.data.path is string
+        && request.resource.data.path.size() <= 512
+        && request.resource.data.url is string
+        && request.resource.data.url.size() <= 2048
+        && request.resource.data.user is map
+        && isValidActivityUser(request.resource.data.user)
+        && exists(/databases/$(database)/documents/Users/$(request.resource.data.user.id))
+        && request.resource.data.device is map
+        && isValidActivityDevice(request.resource.data.device)
+        && (!("referrer" in request.resource.data)
+          || (request.resource.data.referrer is string
+            && request.resource.data.referrer.size() <= 2048))
+        && (!("geo" in request.resource.data)
+          || (request.resource.data.geo is map
+            && isValidActivityGeo(request.resource.data.geo)))
+        && !("details" in request.resource.data)
+        && request.resource.data.createdAt == request.time;
+      allow update, delete: if false;
+    }
+
+    match /paymentIDs/{paymentId} {
+      allow read, write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

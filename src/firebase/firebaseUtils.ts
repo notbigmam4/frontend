@@ -14,34 +14,26 @@ import {
     startAfter,
     updateDoc,
 } from "firebase/firestore";
-import type { DocumentData, QueryDocumentSnapshot } from "firebase/firestore";
+import type { DocumentData, QueryDocumentSnapshot, Timestamp } from "firebase/firestore";
 import {db, imgdb} from './firebaseConfig'
-import { getStorage, ref, deleteObject, listAll, uploadBytes, getDownloadURL } from "firebase/storage";
-import { ChangeEvent } from "react";
+import { ref, deleteObject, listAll, uploadBytes, getDownloadURL } from "firebase/storage";
+import type { ChangeEvent } from "react";
 import { nanoid } from 'nanoid';
 import { UserType } from "../types/User";
 import type { ActivityLog, ActivityLogInput } from "../types/ActivityLog";
 import { generateRandomId16 } from "../utils";
+
+type SupportMessage = {
+    id:string
+    email:string
+    message:string
+    createdAt?:Timestamp | null
+}
+
 async function deleteImages(folder:string) {
-
-    const storage = getStorage();
-    // Create a reference under which you want to list
-    const listRef = ref(storage, folder);
-
-    // Find all the prefixes and items.
-    listAll(listRef)
-    .then((res) => {
-        res.items.forEach((itemRef) => {
-            deleteObject(itemRef).then(() => {
-                    console.log('success')
-                }).catch((error) => {
-                console.error(error)
-                });
-        });
-    }).catch((error) => {
-        console.error(error)
-    });
-
+    const listRef = ref(imgdb, folder);
+    const result = await listAll(listRef)
+    await Promise.all(result.items.map((itemRef)=>deleteObject(itemRef)))
 }
 
 async function uploadImage(folder:string | undefined,e:ChangeEvent<HTMLInputElement> | undefined) {
@@ -98,7 +90,7 @@ async function setDagenstall (inp:string) {
     
     
 }
-async function createUser (slug:string,inp:string) {
+async function createUser (slug:string) {
     function generateRandomCode() {
         const min = 100000;
         const max = 999999;
@@ -111,7 +103,6 @@ async function createUser (slug:string,inp:string) {
 
     await setDoc(doc(userref, randomCode.toString()), {
         slug,
-        plug:inp,
         status:'pending',
         id:randomCode.toString()
     });
@@ -119,14 +110,9 @@ async function createUser (slug:string,inp:string) {
     
 }
 async function addDataUser (id:string,img:string,name:string,birthday:string) {
-    
-
     const userref = collection(db, "Users");
-    const prevdataraw = await getUser(id)
-    const prevdata = prevdataraw?.data
     try {
         await updateDoc(doc(userref, id), {
-            ...prevdata,
             img,
             name,
             birthday
@@ -138,19 +124,14 @@ async function addDataUser (id:string,img:string,name:string,birthday:string) {
     
 }
 async function updateDataUser (id:string,name:string | undefined,birthday:string | undefined) {
-    
-
     const userref = collection(db, "Users");
-    const prevdataraw = await getUser(id)
-    const prevdata = prevdataraw?.data
-    const newname = name?name:prevdata?.name
-    const newbirthday = birthday?birthday:prevdata?.birthday
     try {
-        await updateDoc(doc(userref, id), {
-            ...prevdata,
-            name:newname,
-            birthday:newbirthday
-        });
+        const updates:Record<string, string> = {}
+        if (name) updates.name = name
+        if (birthday) updates.birthday = birthday
+        if (Object.keys(updates).length > 0) {
+            await updateDoc(doc(userref, id), updates);
+        }
         return {}
     } catch (error) {
         return {error}
@@ -176,13 +157,14 @@ async function deleteUser (id:string) {
     await deleteDoc(usersref)
 }
 
-async function createPaymentID (email:string):Promise<{ data: any; error: number|false; }> {
+async function createPaymentID (email:string):Promise<{ data: {paymentId:string} | false; error: number|false; }> {
     const usersref = doc(db, 'paymentIDs',email.toString())
     try {
         const initid = await getDoc(usersref)
+        const existingData = initid.data()
 
-        if (initid.data()) {
-            return {data:initid.data(),error:false}
+        if (typeof existingData?.paymentId === 'string') {
+            return {data:{paymentId:existingData.paymentId},error:false}
         } 
         const newid = generateRandomId16()
 
@@ -192,7 +174,7 @@ async function createPaymentID (email:string):Promise<{ data: any; error: number
             })
             return {data:{paymentId:newid},error:false}
 
-        } catch (error) {
+        } catch {
             return {error:2,data:false}
         }
 
@@ -206,41 +188,41 @@ async function createPaymentID (email:string):Promise<{ data: any; error: number
     
 }
 async function AddMessageUser (email:string | undefined,msg:string | undefined) {
-    
-
-    const userref = collection(db, "Messages");
-    const docref = doc(userref,email)
-    const prevmsgs = await getDoc(docref)
-    console.log(prevmsgs?.data())
-    const id = nanoid()
-    if (prevmsgs?.data()) {
-        console.log(JSON.stringify({[id]:msg}))
-        await setDoc(doc(userref, email), {
-            ...prevmsgs.data(),
-            [id]:msg
-        });
-    } else {
-        await setDoc(docref, {
-            email,
-            [id]:msg
-        });
+    const normalizedEmail = email?.trim()
+    const normalizedMessage = msg?.trim()
+    if (!normalizedEmail || !normalizedMessage) {
+        throw new Error('Email and message are required')
     }
-    
-        
-    
+
+    await addDoc(collection(db, "Messages"), {
+        email:normalizedEmail,
+        message:normalizedMessage,
+        createdAt:serverTimestamp()
+    })
 }
 
-async function GetMessages () {
-    
+async function GetMessages ():Promise<SupportMessage[]> {
+    const snapshot = await getDocs(collection(db, "Messages"))
+    return snapshot.docs.flatMap((messageDoc)=>{
+        const data = messageDoc.data()
+        if (typeof data.email !== 'string') return []
+        if (typeof data.message === 'string') {
+            return [{
+                id:messageDoc.id,
+                email:data.email,
+                message:data.message,
+                createdAt:data.createdAt as Timestamp | undefined
+            }]
+        }
 
-    const userref = collection(db, "Messages");
-    
-    
-    const messagesraw = await getDocs(userref)
-    const messages = messagesraw.docs as unknown
-    return messages as {data:Function}[]
-    
-    
+        return Object.entries(data)
+            .filter(([key, value])=>key !== 'email' && typeof value === 'string')
+            .map(([key, message])=>({
+                id:`${messageDoc.id}-${key}`,
+                email:data.email as string,
+                message:message as string
+            }))
+    })
 }
 
 type ActivityLogCursor = QueryDocumentSnapshot<DocumentData>
@@ -277,4 +259,4 @@ async function getActivityLogsPage (
 export {getUser, createUser,getDagenstall,addDataUser, deleteImages, uploadImage, setDagenstall, 
     getUsers, deleteUser, updateDataUser, createPaymentID, AddMessageUser, GetMessages,
     addActivityLog, getActivityLogsPage}
-export type {ActivityLogCursor}
+export type {ActivityLogCursor, SupportMessage}

@@ -235,6 +235,10 @@ function ConfirmEMailStep() {
   async function handleonclick(e:React.SyntheticEvent<Element, Event>) {
       setloading(true)
       const id = await createPaymentID(values.zodemail.email)
+      if (!id.data) {
+        setloading(false)
+        return
+      }
       form.setValue('zodpaymentid.id',id.data.paymentId)
       const price = await getMoneroPrice()
       const amountmonero = 50/Number(price['USD'])

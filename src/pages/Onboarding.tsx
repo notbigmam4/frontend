@@ -63,7 +63,7 @@ const Onboarding = () => {
         }
     
         // Check if each name part has at least two letters
-        for (let part of nameParts) {
+        for (const part of nameParts) {
             if (part.length < 2) {
                 return false;
             }
@@ -78,7 +78,7 @@ const Onboarding = () => {
         if (!globalcontext?.user) {
             navigate('/')
           }
-    },[globalcontext?.user])
+    },[globalcontext?.user, navigate])
 
     useEffect(()=>{
         if (!img) {
@@ -116,34 +116,40 @@ const Onboarding = () => {
     async function submitData() {
         if (!globalcontext?.user?.id) {
             setsubmitDataError(true)
-            alert(`error submitting: ${submitDataError}`)
             return
         }
-        await deleteImages(globalcontext.user.id)
-        const imgURL = await uploadImage('Imgs',imgevent)
-        if (imgURL?.error) {
-            console.log('shit')
-        } else {
-            setImg(imgURL?.imgURL as string) 
-        }
-        const res = await addDataUser(globalcontext.user.id,imgURL?.imgURL as string,name,birthday)
-        if (res?.error) {
+        setsubmitDataError(false)
+        try {
+            await deleteImages(globalcontext.user.id)
+            const imgURL = await uploadImage(globalcontext.user.id,imgevent)
+            if (imgURL?.error || !imgURL?.imgURL) {
+                setsubmitDataError(true)
+                return
+            }
+            setImg(imgURL.imgURL)
+            const res = await addDataUser(globalcontext.user.id,imgURL.imgURL,name,birthday)
+            if (res?.error) {
+                setsubmitDataError(true)
+                return
+            }
+            globalcontext?.setUser(undefined)
+        } catch {
             setsubmitDataError(true)
-            alert(`error submitting: ${submitDataError}`)
-            return
         }
-        globalcontext?.setUser(undefined)
     }
     async function uploadfilehelper(e:ChangeEvent<HTMLInputElement>) {
         setImgevent(e)
-        const imgURL = await uploadImage(globalcontext?.user?.id as string,e)
-        console.log('uploaded')
-        if (imgURL?.error) {
-            console.log('shit')
-        } else {
-            setImg(imgURL?.imgURL as string) 
+        setsubmitDataError(false)
+        try {
+            const imgURL = await uploadImage(globalcontext?.user?.id as string,e)
+            if (imgURL?.error) {
+                setsubmitDataError(true)
+            } else {
+                setImg(imgURL?.imgURL as string)
+            }
+        } catch {
+            setsubmitDataError(true)
         }
-        console.log('uploaded1')
 
     }
 
@@ -195,6 +201,7 @@ const Onboarding = () => {
             
         </div>
         <p className=' text-gray-500 text-sm font-bold text-center'>Du kan ikke endre din data etter test-ID er opprettet</p>
+        {submitDataError && <p className='text-sm text-destructive'>Kunne ikke lagre data. Prøv igjen.</p>}
         
         {
             displayterms?

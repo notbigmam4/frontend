@@ -16,12 +16,13 @@ const Support = () => {
   const [text,settext] = useState('')
   const [sent,setsent] = useState(false)
   const [loading,setloading] = useState(false)
+  const [error,setError] = useState('')
   useEffect(()=>{
     const emailq = searchParams.get('mail');
     if (emailq) {
         setemail(emailq)
     }
-  },[])
+  },[searchParams])
   return (
     <div className=' w-screen max-w-[500px] min-h-[calc(100vh-74px)] items-center justify-center flex flex-col '>
         <div className=' w-10/12 flex flex-col gap-6 relative'>
@@ -38,12 +39,17 @@ const Support = () => {
             </div>
             <div className=' flex justify-between items-center w-full mt-4 '>
                 <p className=' text-sm text-muted-foreground h-fit'>Vi sender svar til oppgitt e-post</p>
-                <Button disabled={loading || (text.length<4) || (email.length<6)} onClick={()=>{
+                <Button disabled={loading || (text.length<4) || (email.length<6)} onClick={async ()=>{
                     setloading(true)
-                    setsent(true)
-                    AddMessageUser(email,text)
-                    setsent(true)
-                    setloading(false)
+                    setError('')
+                    try {
+                        await AddMessageUser(email,text)
+                        setsent(true)
+                    } catch {
+                        setError('Kunne ikke sende meldingen. Prøv igjen.')
+                    } finally {
+                        setloading(false)
+                    }
                 }}>{
                     loading?
                     <ClipLoader size={18} className=' mx-12 ' color='black'/>
@@ -52,6 +58,7 @@ const Support = () => {
 
                 }</Button>
             </div>
+            {error && <p className='text-sm text-destructive'>{error}</p>}
             </>
             :
             <div className=' w-full flex flex-col items-center gap-2'>
