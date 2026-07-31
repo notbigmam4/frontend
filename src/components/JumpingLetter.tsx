@@ -13,7 +13,6 @@ const BOTTOM_INSET = 2;
 const TOP_GREY = 140;
 const BOTTOM_GREY = 190;
 const TILT_SPAN = 30 * Math.PI / 180;
-const ANGLE_FILTER_ALPHA = 0.25;
 
 const clamp = (value: number, minimum: number, maximum: number) =>
     Math.min(Math.max(value, minimum), maximum);
@@ -57,8 +56,7 @@ const JumpingLetter: React.FC<JumpingLetterProps> = ({ motionEnabled }) => {
     const trackRef = useRef<HTMLDivElement>(null);
     const groupRef = useRef<HTMLDivElement>(null);
     const boundsRef = useRef({ minimum: MIN_Y, maximum: MIN_Y });
-    const baselineAngleRef = useRef<number>();
-    const filteredAngleRef = useRef<number>();
+    const previousAngleRef = useRef<number>();
     const positionRatioRef = useRef(0.5);
     const targetY = useMotionValue(MIN_Y);
     const y = useSpring(targetY, {
@@ -116,9 +114,8 @@ const JumpingLetter: React.FC<JumpingLetterProps> = ({ motionEnabled }) => {
             return;
         }
 
-        const resetBaseline = () => {
-            baselineAngleRef.current = undefined;
-            filteredAngleRef.current = undefined;
+        const resetPositionTracking = () => {
+            previousAngleRef.current = undefined;
             positionRatioRef.current = 0.5;
             setPositionFromRatio(0.5);
         };
@@ -130,30 +127,20 @@ const JumpingLetter: React.FC<JumpingLetterProps> = ({ motionEnabled }) => {
                 return;
             }
 
-            if (
-                baselineAngleRef.current === undefined ||
-                filteredAngleRef.current === undefined
-            ) {
-                baselineAngleRef.current = angle;
-                filteredAngleRef.current = angle;
+            if (previousAngleRef.current === undefined) {
+                previousAngleRef.current = angle;
                 positionRatioRef.current = 0.5;
                 setPositionFromRatio(0.5);
                 return;
             }
 
-            const filterDelta = normalizeAngleDelta(
-                angle - filteredAngleRef.current,
+            const angleDelta = normalizeAngleDelta(
+                angle - previousAngleRef.current,
             );
-            const filteredAngle =
-                filteredAngleRef.current +
-                ANGLE_FILTER_ALPHA * filterDelta;
-            filteredAngleRef.current = filteredAngle;
+            previousAngleRef.current = angle;
 
-            const relativeTilt = normalizeAngleDelta(
-                filteredAngle - baselineAngleRef.current,
-            );
             const ratio = clamp(
-                0.5 + relativeTilt / TILT_SPAN,
+                positionRatioRef.current + angleDelta / TILT_SPAN,
                 0,
                 1,
             );
@@ -163,7 +150,7 @@ const JumpingLetter: React.FC<JumpingLetterProps> = ({ motionEnabled }) => {
         };
 
         const registerOrientationListener = () => {
-            resetBaseline();
+            resetPositionTracking();
             window.removeEventListener(
                 'deviceorientation',
                 handleOrientation,
@@ -179,7 +166,10 @@ const JumpingLetter: React.FC<JumpingLetterProps> = ({ motionEnabled }) => {
             'motionpermissiongranted',
             registerOrientationListener,
         );
-        window.addEventListener('orientationchange', resetBaseline);
+        window.addEventListener(
+            'orientationchange',
+            resetPositionTracking,
+        );
 
         return () => {
             window.removeEventListener(
@@ -192,7 +182,7 @@ const JumpingLetter: React.FC<JumpingLetterProps> = ({ motionEnabled }) => {
             );
             window.removeEventListener(
                 'orientationchange',
-                resetBaseline,
+                resetPositionTracking,
             );
         };
     }, [motionEnabled, setPositionFromRatio]);
