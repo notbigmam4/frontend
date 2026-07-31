@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Move3D, X } from 'lucide-react';
+import { Move3D } from 'lucide-react';
 import { Button } from '../../@/components/ui/button';
 
 type DeviceOrientationPermissionEvent = typeof DeviceOrientationEvent & {
@@ -74,15 +74,6 @@ const MotionPermissionPopup = ({
                 animate={{ opacity: 1, scale: 1 }}
                 className="relative flex w-[calc(100%_-_32px)] max-w-[420px] flex-col items-center rounded-lg bg-white px-8 py-8 text-center"
             >
-                <button
-                    type="button"
-                    aria-label="Lukk"
-                    className="absolute left-6 top-6 cursor-pointer text-gray-500"
-                    onClick={onClose}
-                >
-                    <X size={18} />
-                </button>
-
                 <Move3D size={40} className="mb-4 mt-2 text-[#444f55]" />
                 <h1 className="text-lg font-bold">Aktiver bevegelse</h1>
                 <p className="mt-2 text-gray-500">
@@ -109,9 +100,6 @@ const MotionPermissionPopup = ({
                 )}
 
                 <div className="mt-6 flex gap-3">
-                    <Button variant="outline" onClick={onClose}>
-                        Ikke nå
-                    </Button>
                     <Button
                         onClick={requestMotionPermission}
                         disabled={permissionState === 'requesting'}
