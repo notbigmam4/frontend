@@ -1,17 +1,10 @@
 
 import React, { useCallback, useEffect, useRef } from 'react';
-import {
-    motion,
-    useMotionValue,
-    useSpring,
-    useTransform,
-} from 'framer-motion';
+import { motion, useMotionValue, useSpring } from 'framer-motion';
 import OvalCircles from './OvalCircles';
 
 const MIN_Y = 10;
 const BOTTOM_INSET = 2;
-const TOP_GREY = 105;
-const BOTTOM_GREY = 190;
 const TILT_SPAN = 30 * Math.PI / 180;
 const ANGLE_FILTER_ALPHA = 0.25;
 
@@ -65,18 +58,6 @@ const JumpingLetter: React.FC<JumpingLetterProps> = ({ motionEnabled }) => {
         stiffness: 240,
         damping: 26,
         mass: 0.7,
-    });
-    const letterColor = useTransform(y, (currentY) => {
-        const { minimum, maximum } = boundsRef.current;
-        const progress =
-            maximum === minimum
-                ? 0
-                : clamp((currentY - minimum) / (maximum - minimum), 0, 1);
-        const grey = Math.round(
-            TOP_GREY + progress * (BOTTOM_GREY - TOP_GREY),
-        );
-
-        return `rgb(${grey}, ${grey}, ${grey})`;
     });
 
     const setPositionFromRatio = useCallback((ratio: number) => {
@@ -208,12 +189,9 @@ const JumpingLetter: React.FC<JumpingLetterProps> = ({ motionEnabled }) => {
                 className="absolute right-[2px] top-0 h-[98px] w-0 overflow-visible"
                 style={{ y }}
             >
-                <motion.div
-                    className="absolute left-[5px] top-[20px] z-10 inline-block text-5xl font-semibold"
-                    style={{ color: letterColor }}
-                >
+                <div className="absolute left-[5px] top-[20px] z-10 inline-block text-5xl font-semibold text-[#969696]">
                     N
-                </motion.div>
+                </div>
                 <OvalCircles />
             </motion.div>
         </div>
