@@ -93,6 +93,7 @@ const Førerkort = ({
           x: navdireaction === 'right' ? 600 : -600
         }}
         transition={{ duration: 0.1, type: 'tween' }}
+        className={interactive ? 'relative h-[100dvh] overflow-hidden overscroll-none' : undefined}
       >
         {interactive && (
           <Navbar setnavdireaction={setnavdireaction} setnavpath={setnavpath} />

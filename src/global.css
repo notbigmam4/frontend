@@ -67,12 +67,34 @@
   --app-nav-offset: 74px;
 }
 
+/* Prefer CSS display-mode — works even if the JS class is late/cached oddly on iOS. */
+@media (display-mode: standalone), (display-mode: fullscreen) {
+  :root {
+    --pwa-urlbar-offset: 80px;
+    --app-safe-top: env(safe-area-inset-top, 0px);
+    --app-footer-height: calc(100px + env(safe-area-inset-bottom, 0px) + var(--pwa-urlbar-offset));
+    --app-bottom-offset: calc(env(safe-area-inset-bottom, 0px) + var(--pwa-urlbar-offset));
+    --app-nav-offset: calc(74px + env(safe-area-inset-top, 0px));
+  }
+
+  html,
+  body {
+    overscroll-behavior: none;
+  }
+}
+
+/* Fallback for older iOS home-screen mode via navigator.standalone */
 html.pwa {
-  --pwa-urlbar-offset: 48px;
+  --pwa-urlbar-offset: 80px;
   --app-safe-top: env(safe-area-inset-top, 0px);
   --app-footer-height: calc(100px + env(safe-area-inset-bottom, 0px) + var(--pwa-urlbar-offset));
   --app-bottom-offset: calc(env(safe-area-inset-bottom, 0px) + var(--pwa-urlbar-offset));
   --app-nav-offset: calc(74px + env(safe-area-inset-top, 0px));
+}
+
+html.pwa,
+html.pwa body {
+  overscroll-behavior: none;
 }
 
 .hide-scrollbar::-webkit-scrollbar {
