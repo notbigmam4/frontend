@@ -29,7 +29,10 @@ const Home = () => {
                 </div>
             </div>
 
-            <div className=" hide-scrollbar min-h-0 flex-1 w-full overflow-hidden flex flex-col justify-between items-center pb-10  ">
+            <div
+              className=" hide-scrollbar min-h-0 flex-1 w-full overflow-hidden flex flex-col justify-between items-center  "
+              style={{ paddingBottom: 'var(--app-home-pb)' }}
+            >
                 
                 <div className=' flex h-fit w-full px-8 items-center justify-center '> 
                     <div className=' flex flex-col items-center w-fit h-fit'>
