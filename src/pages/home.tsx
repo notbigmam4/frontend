@@ -14,18 +14,22 @@ const Home = () => {
             animate={{ x: 0 }}
             exit={{x:-600 }}
             transition={{duration:0.2, type:'tween'}}
-            className=' h-screen w-screen relative'
+            className=' h-[100dvh] w-screen relative overflow-hidden flex flex-col'
+            style={{ paddingBottom: 'var(--app-bottom-offset)' }}
             > 
             <RotatingImage left={false}/>
 
-            <div className=' flex h-[10%] w-full px-8 flex-row-reverse pt-[36px] '> 
+            <div
+              className=' flex shrink-0 w-full px-8 flex-row-reverse pb-2 '
+              style={{ paddingTop: 'calc(36px + var(--app-safe-top))' }}
+            > 
                 <div className=' flex flex-col items-center w-fit h-fit'>
                         <NavLink to={'/d'}><User size={20} /></NavLink>
                         <div className=' text-[12px] font-medium leading-snug'>Profil</div>
                 </div>
             </div>
 
-            <div className=" hide-scrollbar h-[90%] w-full overflow-y-scroll overflow-x-hidden flex flex-col justify-between items-center pb-10  ">
+            <div className=" hide-scrollbar min-h-0 flex-1 w-full overflow-hidden flex flex-col justify-between items-center pb-10  ">
                 
                 <div className=' flex h-fit w-full px-8 items-center justify-center '> 
                     <div className=' flex flex-col items-center w-fit h-fit'>

@@ -5,8 +5,9 @@ const Navbar = ({setnavdireaction, setnavpath}:{setnavdireaction:Function, setna
   const location = useLocation();
   const { pathname } = location;
   return (
-    <div className={` fixed top-0 left-0  w-screen pt-6 pb-4 z-50 
-     bg-white flex items-center justify-center ${(pathname === `/f`)?'':'border-b border-[#E8E8E8]'}`}>
+    <div className={` fixed top-0 left-0  w-screen pb-4 z-50 
+     bg-white flex items-center justify-center ${(pathname === `/f`)?'':'border-b border-[#E8E8E8]'}`}
+     style={{ paddingTop: 'calc(1.5rem + var(--app-safe-top))' }}>
         <div onClick={()=>{
           setnavdireaction('left')
           if (pathname==='/k') {

@@ -99,9 +99,19 @@ const Førerkort = ({
         )}
 
         <div
-          className={`hide-scrollbar h-screen w-full overflow-y-scroll ${
-            !interactive ? 'h-full scale-90 overflow-y-hidden' : 'pt-[74px]'
-          } overflow-x-hidden flex flex-col items-center`}
+          className={`hide-scrollbar w-full overflow-x-hidden flex flex-col items-center ${
+            !interactive
+              ? 'h-full scale-90 overflow-y-hidden'
+              : 'h-[100dvh] overflow-y-hidden'
+          }`}
+          style={
+            interactive
+              ? {
+                  paddingTop: 'var(--app-nav-offset)',
+                  paddingBottom: 'var(--app-footer-height)',
+                }
+              : undefined
+          }
         >
           <RotatingImage left={true} />
 

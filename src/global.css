@@ -58,6 +58,23 @@
     --chart-5: 340 75% 55%;
   }
 }
+:root {
+  /* Extra bottom space only in installed PWA (web keeps Safari URL-bar spacing). */
+  --pwa-urlbar-offset: 0px;
+  --app-safe-top: 0px;
+  --app-footer-height: 100px;
+  --app-bottom-offset: 0px;
+  --app-nav-offset: 74px;
+}
+
+html.pwa {
+  --pwa-urlbar-offset: 48px;
+  --app-safe-top: env(safe-area-inset-top, 0px);
+  --app-footer-height: calc(100px + env(safe-area-inset-bottom, 0px) + var(--pwa-urlbar-offset));
+  --app-bottom-offset: calc(env(safe-area-inset-bottom, 0px) + var(--pwa-urlbar-offset));
+  --app-nav-offset: calc(74px + env(safe-area-inset-top, 0px));
+}
+
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
   -ms-overflow-style: none;
