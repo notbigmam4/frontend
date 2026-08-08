@@ -70,7 +70,7 @@ const Landing = () => {
         document.getElementById("otpinput")?.focus();
     },[])
     return (
-        <div className=' w-screen h-[calc(100vh-74px)] flex flex-col items-center justify-center gap-3'>
+        <div className=' w-screen h-[calc(100vh-74px)] flex flex-col items-center justify-center gap-3 pb-24'>
             <div className="flex flex-col items-center text-2xl mb-12 font-regular text-[#444f55] ">
                 <h1 className=' '>Tast inn din </h1>
                 <h1 className=' '>personlige kode</h1>
@@ -88,6 +88,17 @@ const Landing = () => {
                     <InputOTPSlot index={5} />
                 </InputOTPGroup>
             </InputOTP>
+            <div
+                className='mt-5 flex max-w-[320px] items-center gap-3 px-2 pointer-events-none select-none'
+                aria-hidden
+            >
+                <div className='relative h-[28px] w-[48px] shrink-0 rounded-full bg-[#e5e5ea]'>
+                    <div className='absolute left-[2px] top-[2px] h-[24px] w-[24px] rounded-full bg-white shadow-sm' />
+                </div>
+                <p className='text-[14px] leading-snug text-[#444f55]'>
+                    Aktiver pålogging med fingeravtrykk / ansiktsgjenkjenning
+                </p>
+            </div>
             {
                 error&&
                 <p className=' text-destructive mt-6'>{error}</p>
@@ -104,7 +115,7 @@ const Landing = () => {
                 />
                 :
                 
-                <NavLink to={'/contact'} className=' cursor-pointer underline text-[#444f55] mt-0'>Jeg har ikke kode</NavLink>
+                <NavLink to={'/contact'} className=' cursor-pointer underline text-[#444f55] mt-6'>Jeg har ikke kode</NavLink>
 
             }
         </div>
