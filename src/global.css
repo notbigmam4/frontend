@@ -76,7 +76,7 @@
     --app-footer-height: calc(100px + env(safe-area-inset-bottom, 0px) + var(--pwa-urlbar-offset));
     --app-bottom-offset: calc(env(safe-area-inset-bottom, 0px) + var(--pwa-urlbar-offset));
     --app-nav-offset: calc(74px + env(safe-area-inset-top, 0px));
-    --app-home-pb: 0.25rem;
+    --app-home-pb: 1.25rem;
   }
 
   html,
@@ -92,7 +92,7 @@ html.pwa {
   --app-footer-height: calc(100px + env(safe-area-inset-bottom, 0px) + var(--pwa-urlbar-offset));
   --app-bottom-offset: calc(env(safe-area-inset-bottom, 0px) + var(--pwa-urlbar-offset));
   --app-nav-offset: calc(74px + env(safe-area-inset-top, 0px));
-  --app-home-pb: 0.25rem;
+  --app-home-pb: 1.25rem;
 }
 
 html.pwa,
