@@ -1,10 +1,11 @@
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import { pwaPlugin } from './pwa.config'
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), pwaPlugin],
   base: '/',
   server: {
     host: '0.0.0.0',
@@ -15,4 +16,4 @@ export default defineConfig({
       key: readFileSync(resolve('.cert/dev-key.pem')),
     },
   },
-});
+})
