@@ -72,30 +72,30 @@ const Landing = () => {
     return (
         <div className=' w-screen h-[calc(100vh-74px)] flex flex-col items-center justify-center gap-3 pb-24'>
             <div className="flex flex-col items-center text-2xl mb-12 font-regular text-[#444f55] ">
-                <h1 className=' '>Tast inn din </h1>
-                <h1 className=' '>personlige kode</h1>
+                <h1>Tast inn din personlige</h1>
+                <h1>kode</h1>
             </div>
             <InputOTP id='otpinput' maxLength={6} onChange={(e)=>setval(e)} value={valauthenting?staticVal:val}>
                 <InputOTPGroup >
-                    <InputOTPSlot index={0} />
-                    <InputOTPSlot index={1} />
-                    <InputOTPSlot index={2} />
+                    <InputOTPSlot index={0} className="h-12 w-12 text-base" />
+                    <InputOTPSlot index={1} className="h-12 w-12 text-base" />
+                    <InputOTPSlot index={2} className="h-12 w-12 text-base" />
                 </InputOTPGroup>
                 <InputOTPSeparator />
                 <InputOTPGroup>
-                    <InputOTPSlot index={3} />
-                    <InputOTPSlot index={4} />
-                    <InputOTPSlot index={5} />
+                    <InputOTPSlot index={3} className="h-12 w-12 text-base" />
+                    <InputOTPSlot index={4} className="h-12 w-12 text-base" />
+                    <InputOTPSlot index={5} className="h-12 w-12 text-base" />
                 </InputOTPGroup>
             </InputOTP>
             <div
-                className='mt-5 flex max-w-[320px] items-center gap-3 px-2 pointer-events-none select-none'
+                className='mt-5 flex max-w-[360px] items-center gap-3.5 px-2 pointer-events-none select-none'
                 aria-hidden
             >
-                <div className='relative h-[28px] w-[48px] shrink-0 rounded-full bg-[#e5e5ea]'>
-                    <div className='absolute left-[2px] top-[2px] h-[24px] w-[24px] rounded-full bg-white shadow-sm' />
+                <div className='relative h-[32px] w-[54px] shrink-0 rounded-full bg-[#e5e5ea]'>
+                    <div className='absolute left-[2px] top-[2px] h-[28px] w-[28px] rounded-full bg-white shadow-sm' />
                 </div>
-                <p className='text-[14px] leading-snug text-[#444f55]'>
+                <p className='text-[16px] leading-snug text-[#444f55]'>
                     Aktiver pålogging med fingeravtrykk / ansiktsgjenkjenning
                 </p>
             </div>
